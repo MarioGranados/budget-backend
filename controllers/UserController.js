@@ -61,4 +61,28 @@ async function loginUser(email, password) {
   }
 }
 
-module.exports = { findUserByEmail, createUser, loginUser };
+const changeUserPassword = async (email, oldPassword, newPassword) => {
+  try {
+    const user = await User.findOne({ email });
+    if (!user) {
+      throw new Error("User not found");
+    }
+
+    const isMatch = await bcrypt.compare(oldPassword, user.password);
+    if (!isMatch) {
+      throw new Error("Incorrect current password");
+    }
+
+    user.password = await bcrypt.hash(newPassword, 10);
+    await user.save();
+
+    return { message: "Password updated successfully" };
+  } catch (err) {
+    throw new Error("Password change failed: " + err.message);
+  }
+};
+
+module.exports = { findUserByEmail, createUser, loginUser, changeUserPassword };
+
+
+module.exports = { findUserByEmail, createUser, loginUser, changeUserPassword };

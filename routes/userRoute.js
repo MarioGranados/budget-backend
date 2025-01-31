@@ -50,4 +50,14 @@ router.delete('/delete-user/:id', async (req, res) => {
   }
 });
 
+router.put('/change-password', async (req, res) => {
+  const { email, oldPassword, newPassword } = req.body;
+  try {
+    const result = await changeUserPassword(email, oldPassword, newPassword);
+    res.status(200).json(result);
+  } catch (err) {
+    res.status(400).json({ message: 'Password change failed', error: err.message });
+  }
+});
+
 module.exports = router;

@@ -1,5 +1,5 @@
 const express = require('express');
-const { authenticateToken } = require('../middleware/authMiddleware');
+const { authenticateToken } = require('../middleware/authMiddleWare');
 const { 
   addExpenseToUser, 
   deleteExpenseById, 
@@ -8,6 +8,7 @@ const {
 } = require('../controllers/ExpenseController');
 const router = express.Router();
 const mongoose = require('mongoose')
+
 
 // Add a single expense to a user
 router.post('/add-expense', authenticateToken, async (req, res) => {

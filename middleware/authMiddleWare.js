@@ -2,6 +2,8 @@
 const jwt = require('jsonwebtoken');
 const JWT_SECRET = process.env.JWT_SECRET || '1234';
 
+
+
 function authenticateToken(req, res, next) {
   const token = req.header('Authorization')?.replace('Bearer ', '');
 

@@ -1,6 +1,6 @@
 const User = require("../models/User");
-const bcrypt = require('bcryptjs'); // Change from 'bcrypt'
-const jwt = require('jsonwebtoken');
+const bcrypt = require("bcryptjs"); // Change from 'bcrypt'
+const jwt = require("jsonwebtoken");
 
 const createUser = async (username, email, password) => {
   // Hash the password
@@ -9,13 +9,13 @@ const createUser = async (username, email, password) => {
   const user = new User({
     username,
     email,
-    password: hashedPassword,  // Save the hashed password
+    password: hashedPassword, // Save the hashed password
   });
 
   try {
     const savedUser = await user.save();
     console.log("User created:", savedUser);
-    return savedUser;  // Return the saved user for use in response
+    return savedUser; // Return the saved user for use in response
   } catch (err) {
     console.error("Error creating user:", err);
     throw new Error("Error creating user");
@@ -34,30 +34,34 @@ const findUserByEmail = async (email) => {
 };
 
 // JWT Secret
-const JWT_SECRET = process.env.JWT_SECRET || 'your_jwt_secret_key';  // Set this in your .env file
+const JWT_SECRET = process.env.JWT_SECRET || "your_jwt_secret_key"; // Set this in your .env file
 
 // Login user
 async function loginUser(email, password) {
   try {
     const user = await User.findOne({ email });
     if (!user) {
-      throw new Error('User not found');
+      throw new Error("User not found");
     }
 
     // Compare the provided password with the hashed password
     const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) {
-      throw new Error('Invalid credentials');
+      throw new Error("Invalid credentials");
     }
 
     // Create a JWT token
-    const token = jwt.sign({ userId: user._id, username: user.username }, JWT_SECRET, {
-      expiresIn: '72h', // Token will expire in 1 hour
-    });
+    const token = jwt.sign(
+      { userId: user._id, username: user.username },
+      JWT_SECRET,
+      {
+        expiresIn: "72h", // Token will expire in 1 hour
+      }
+    );
 
     return { token, user };
   } catch (err) {
-    throw new Error('Login failed: ' + err.message);
+    throw new Error("Login failed: " + err.message);
   }
 }
 
@@ -82,7 +86,41 @@ const changeUserPassword = async (email, oldPassword, newPassword) => {
   }
 };
 
-module.exports = { findUserByEmail, createUser, loginUser, changeUserPassword };
+const updateUserIncome = async (userId, income) => {
+  try {
+    const user = await User.findById(userId);
+    if (!user) {
+      throw new Error("User not found");
+    }
+
+    user.income = income; // Assume 'income' field exists in the User model
+    await user.save();
+
+    return user; // Return the updated user object
+  } catch (err) {
+    throw new Error("Income update failed: " + err.message);
+  }
+};
+
+// Controller function to get the user's income
+async function getUserIncome(userId) {
+  try {
+    const user = await User.findById(userId); // Find user by ID
+    if (!user) {
+      throw new Error("User not found");
+    }
+    return user.income; // Assuming the user document has an "income" field
+  } catch (err) {
+    throw new Error(`Error fetching income: ${err.message}`);
+  }
+}
 
 
-module.exports = { findUserByEmail, createUser, loginUser, changeUserPassword };
+module.exports = {
+  findUserByEmail,
+  createUser,
+  loginUser,
+  changeUserPassword,
+  updateUserIncome,
+  getUserIncome
+};

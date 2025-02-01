@@ -83,6 +83,3 @@ const changeUserPassword = async (email, oldPassword, newPassword) => {
 };
 
 module.exports = { findUserByEmail, createUser, loginUser, changeUserPassword };
-
-
-module.exports = { findUserByEmail, createUser, loginUser, changeUserPassword };

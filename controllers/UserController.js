@@ -46,6 +46,7 @@ async function loginUser(email, password) {
 
     // Compare the provided password with the hashed password
     const isMatch = await bcrypt.compare(password, user.password);
+
     if (!isMatch) {
       throw new Error("Invalid credentials");
     }
@@ -59,7 +60,12 @@ async function loginUser(email, password) {
       }
     );
 
-    return { token, user };
+    // Convert to plain object and remove sensitive fields
+    const userObject = user.toObject();
+    delete userObject.password;
+    delete userObject.__v;
+
+    return { token, user: userObject };
   } catch (err) {
     throw new Error("Login failed: " + err.message);
   }
@@ -115,12 +121,11 @@ async function getUserIncome(userId) {
   }
 }
 
-
 module.exports = {
   findUserByEmail,
   createUser,
   loginUser,
   changeUserPassword,
   updateUserIncome,
-  getUserIncome
+  getUserIncome,
 };

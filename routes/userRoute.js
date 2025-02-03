@@ -1,7 +1,7 @@
 const express = require("express");
 const { authenticateToken } = require("../middleware/authMiddleWare");
-const crypto = require("crypto");
 const { sendVerificationEmail } = require("../services/mailer");
+const generateVerificationCode  = require('../utils/generateVerificationCode');
 const User = require("../models/User");
 
 const {
@@ -13,11 +13,6 @@ const {
   getUserIncome,
 } = require("../controllers/UserController");
 const router = express.Router();
-
-// Helper function to generate a random 4-digit verification code
-const generateVerificationCode = () => {
-  return Math.floor(1000 + Math.random() * 9000).toString(); // Generates a 4-digit number
-};
 
 // Register a new user
 router.post("/register", async (req, res) => {
@@ -108,6 +103,7 @@ router.post("/verify-email", authenticateToken, async (req, res) => {
     const userId = req.user.userId;
     const verificationCode = req.body.verificationCode;
 
+
     // Retrieve the full user object
     const user = await User.findById(userId);
     if (!user) {
@@ -116,6 +112,7 @@ router.post("/verify-email", authenticateToken, async (req, res) => {
 
     // Check if the verification code matches
     if (user.verificationCode !== verificationCode) {
+
       return res.status(400).json({ message: "Invalid verification code" });
     }
 

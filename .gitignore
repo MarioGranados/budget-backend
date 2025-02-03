@@ -2,6 +2,3 @@
 ./env
 
 docs.md
-
-./node_modules/public-encrypt/test/test_rsa_privkey.pem
-node_modules/public-encrypt/test/test_rsa_privkey.pemnode_modules/public-encrypt/test/test_rsa_privkey.pem

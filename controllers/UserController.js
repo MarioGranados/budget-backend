@@ -1,7 +1,8 @@
 const User = require("../models/User");
 const bcrypt = require("bcryptjs"); // Change from 'bcrypt'
 const jwt = require("jsonwebtoken");
-const crypto = require('crypto-browserify');
+const generateVerificationCode  = require('../utils/generateVerificationCode');
+
 const { sendVerificationEmail } = require("../services/mailer");
 
 
@@ -11,7 +12,7 @@ const JWT_SECRET = process.env.JWT_SECRET || "your_jwt_secret_key"; // Set this 
 const createUser = async (username, email, password) => {
   // Hash the password
   const hashedPassword = await bcrypt.hash(password, 10);
-  const vCode = crypto.randomBytes(20).toString("hex"); // Generate a verification code
+  const vCode = generateVerificationCode() // Generate a verification code
 
   const user = new User({
     username,
@@ -139,7 +140,7 @@ const resendVerificationEmail = async (userId) => {
     }
 
     // Generate a new verification code
-    const newVerificationCode = crypto.randomBytes(20).toString("hex");
+    const newVerificationCode = generateVerificationCode()
 
     // Update the user's verification code in the database
     user.verificationCode = newVerificationCode;

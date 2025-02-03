@@ -1,5 +1,5 @@
-const mongoose = require('mongoose');
-const Expense = require('./Expense'); // Import the Expense model
+const mongoose = require("mongoose");
+const Expense = require("./Expense"); // Import the Expense model
 
 // Define the User schema
 const userSchema = new mongoose.Schema({
@@ -14,7 +14,7 @@ const userSchema = new mongoose.Schema({
     type: String,
     required: true,
     unique: true,
-    match: [/^\S+@\S+\.\S+$/, 'Please enter a valid email address'],
+    match: [/^\S+@\S+\.\S+$/, "Please enter a valid email address"],
   },
   password: {
     type: String,
@@ -25,17 +25,21 @@ const userSchema = new mongoose.Schema({
     type: Number,
     required: true,
     default: 0,
-    min: 0
+    min: 0,
   },
-  expenses: [{
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'Expense', // Reference to the Expense model
-  }],
+  expenses: [
+    {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Expense", // Reference to the Expense model
+    },
+  ],
+  isVerified: { type: Boolean, default: false },
+  verificationCode: { type: String, required: true },
   createdAt: {
     type: Date,
-    default: Date.now
-  }
+    default: Date.now,
+  },
 });
 
 // Create a model from the schema
-module.exports = mongoose.model('User', userSchema);
+module.exports = mongoose.model("User", userSchema);

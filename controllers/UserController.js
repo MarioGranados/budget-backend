@@ -1,21 +1,33 @@
 const User = require("../models/User");
 const bcrypt = require("bcryptjs"); // Change from 'bcrypt'
 const jwt = require("jsonwebtoken");
+const crypto = require('crypto-browserify');
+const { sendVerificationEmail } = require("../services/mailer");
+
+
+// JWT Secret
+const JWT_SECRET = process.env.JWT_SECRET || "your_jwt_secret_key"; // Set this in your .env file
 
 const createUser = async (username, email, password) => {
   // Hash the password
   const hashedPassword = await bcrypt.hash(password, 10);
+  const vCode = crypto.randomBytes(20).toString("hex"); // Generate a verification code
 
   const user = new User({
     username,
     email,
-    password: hashedPassword, // Save the hashed password
+    password: hashedPassword,
+    verificationCode: vCode,
   });
 
   try {
     const savedUser = await user.save();
     console.log("User created:", savedUser);
-    return savedUser; // Return the saved user for use in response
+
+    // Send verification email immediately after user creation
+    await sendVerificationEmail(savedUser.email, vCode);
+
+    return savedUser;
   } catch (err) {
     console.error("Error creating user:", err);
     throw new Error("Error creating user");
@@ -32,9 +44,6 @@ const findUserByEmail = async (email) => {
     throw err;
   }
 };
-
-// JWT Secret
-const JWT_SECRET = process.env.JWT_SECRET || "your_jwt_secret_key"; // Set this in your .env file
 
 // Login user
 async function loginUser(email, password) {
@@ -121,6 +130,31 @@ async function getUserIncome(userId) {
   }
 }
 
+const resendVerificationEmail = async (userId) => {
+  try {
+    // Find the user by their ID
+    const user = await User.findById(userId);
+    if (!user) {
+      throw new Error("User not found");
+    }
+
+    // Generate a new verification code
+    const newVerificationCode = crypto.randomBytes(20).toString("hex");
+
+    // Update the user's verification code in the database
+    user.verificationCode = newVerificationCode;
+    await user.save();
+
+    // Send the new verification email with the new code
+    await sendVerificationEmail(user.email, newVerificationCode);
+
+    return { message: "Verification email sent successfully" };
+  } catch (err) {
+    console.error("Error resending verification email:", err);
+    throw new Error("Failed to resend verification email: " + err.message);
+  }
+};
+
 module.exports = {
   findUserByEmail,
   createUser,
@@ -128,4 +162,5 @@ module.exports = {
   changeUserPassword,
   updateUserIncome,
   getUserIncome,
+  resendVerificationEmail,
 };

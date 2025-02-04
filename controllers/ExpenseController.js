@@ -1,6 +1,6 @@
 const Expense = require("../models/Expense");
 const User = require("../models/User");
-const mongoose = require('mongoose');
+const mongoose = require("mongoose");
 
 // Add a single expense to a user
 const addExpenseToUser = async (userId, expenseData) => {
@@ -31,27 +31,24 @@ const deleteExpenseById = async (expenseId, userId) => {
 const getAllExpensesFromUser = async (userId) => {
   // Check if userId is a valid ObjectId
   if (!mongoose.Types.ObjectId.isValid(userId)) {
-    console.log('Invalid userId format:', userId); // Debugging: Log invalid userId
-    throw new Error('Invalid userId format');
+    throw new Error("Invalid userId format");
   }
 
   try {
     // Populate the expenses array with expense details
-    const user = await User.findById(userId).populate('expenses');
-    if (!user) throw new Error('User not found');
-    
+    const user = await User.findById(userId).populate("expenses");
+    if (!user) throw new Error("User not found");
+
     return user.expenses;
   } catch (err) {
     // Handle any other errors (e.g., database issues)
-    console.log('Error retrieving expenses:', err);  // Debugging: Log the error
-    throw new Error('Error retrieving expenses: ' + err.message);
+    console.log("Error retrieving expenses:", err); // Debugging: Log the error
+    throw new Error("Error retrieving expenses: " + err.message);
   }
 };
 
 // Add multiple expenses
 const addNewExpenses = async (userId, expensesData) => {
-
-  console.log(userId)
   // Insert multiple expenses into the database
   const expenses = await Expense.insertMany(expensesData);
 
@@ -63,9 +60,12 @@ const addNewExpenses = async (userId, expensesData) => {
     $push: { expenses: { $each: expenseIds } }, // Attach multiple expenses to user
   });
 
-
-
   return expenses;
 };
 
-module.exports = { addNewExpenses, getAllExpensesFromUser, deleteExpenseById, addExpenseToUser };
+module.exports = {
+  addNewExpenses,
+  getAllExpensesFromUser,
+  deleteExpenseById,
+  addExpenseToUser,
+};

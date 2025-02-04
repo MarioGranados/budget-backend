@@ -3,8 +3,20 @@ const mongoose = require('mongoose');
 require('dotenv').config();
 const userRoutes = require('./routes/userRoute')
 const expensesRoutes = require('./routes/expenseRoute')
+const cors = require("cors");
+
 
 const app = express();
+
+// Enable CORS for your front-end app (React running on http://localhost:3001)
+app.use(
+  cors({
+    origin: "http://localhost:3001", // Your React front-end URL change in production
+    methods: ["GET", "POST", "PUT", "DELETE"], // Allowed methods
+    credentials: true, // If you're using cookies, set this to true
+  })
+);
+
 app.use(express.json());
 
 // MongoDB Connection

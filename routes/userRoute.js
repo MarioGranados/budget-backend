@@ -15,7 +15,6 @@ const {
 const { findById } = require("../models/Expense");
 const router = express.Router();
 
-// Register a new user
 router.post("/register", async (req, res) => {
   const { username, email, password } = req.body;
   try {
@@ -26,11 +25,18 @@ router.post("/register", async (req, res) => {
     newUser.verificationCode = verificationCode;
     await newUser.save();
 
+    // Convert to plain object if it's a Mongoose document
+    const userObject = newUser.toObject ? newUser.toObject() : newUser;
+
+    // Remove sensitive fields
+    userObject.password = undefined;
+    userObject.__v = undefined;
+
     await sendVerificationEmail(newUser.email, verificationCode); // Send verification email
 
     res.status(200).json({
       message: "User created. Please verify your email.",
-      user: newUser,
+      user: userObject,
     });
   } catch (err) {
     res
@@ -38,6 +44,7 @@ router.post("/register", async (req, res) => {
       .json({ message: "Error creating user", error: err.message });
   }
 });
+
 
 // Login a user
 router.post("/login", async (req, res) => {
@@ -49,6 +56,7 @@ router.post("/login", async (req, res) => {
       token,
       user,
     });
+
   } catch (err) {
     res.status(400).json({ message: "Login failed", error: err.message });
   }
@@ -58,11 +66,17 @@ router.post("/login", async (req, res) => {
 router.get("/me", authenticateToken, async (req, res) => {
   try {
     const user = await getUserData(req.user.userId); // Await the result of getUserData
+    // Convert to plain object to remove fields safely
+    const userObject = user.toObject ? user.toObject() : user;
+
+    // Remove sensitive fields
+    userObject.password = undefined;
+    userObject.__v = undefined;
 
     if (!user) {
       return res.status(404).json({ message: "User not found" });
     }
-    res.json({ user });
+    res.json({ user: userObject });
   } catch (err) {
     res.status(500).json({ message: "Error finding user", error: err.message });
   }

@@ -31,7 +31,6 @@ const deleteExpenseById = async (expenseId, userId) => {
 const getAllExpensesFromUser = async (userId) => {
   // Check if userId is a valid ObjectId
   if (!mongoose.Types.ObjectId.isValid(userId)) {
-    console.log("Invalid userId format:", userId); // Debugging: Log invalid userId
     throw new Error("Invalid userId format");
   }
 

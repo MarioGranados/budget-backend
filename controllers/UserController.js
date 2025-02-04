@@ -23,7 +23,6 @@ const createUser = async (username, email, password) => {
 
   try {
     const savedUser = await user.save();
-    console.log("User created:", savedUser);
 
     // Send verification email immediately after user creation
     await sendVerificationEmail(savedUser.email, vCode);
@@ -35,10 +34,10 @@ const createUser = async (username, email, password) => {
   }
 };
 
-// Function to find a user by email
-const findUserByEmail = async (email) => {
+// Function to find a user data
+const getUserData = async (userId) => {
   try {
-    const user = await User.findOne({ email });
+    const user = await User.findById(userId);
     return user;
   } catch (err) {
     console.error("Error finding user:", err);
@@ -157,7 +156,7 @@ const resendVerificationEmail = async (userId) => {
 };
 
 module.exports = {
-  findUserByEmail,
+  getUserData,
   createUser,
   loginUser,
   changeUserPassword,

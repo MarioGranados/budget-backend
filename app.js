@@ -11,7 +11,7 @@ const app = express();
 // Enable CORS for your front-end app (React running on http://localhost:3001)
 app.use(
   cors({
-    origin: "http://localhost:3001", // Your React front-end URL change in production
+    origin: `${process.env.URL_ORIGIN}`, // Your React front-end URL change in production
     methods: ["GET", "POST", "PUT", "DELETE"], // Allowed methods
     credentials: true, // If you're using cookies, set this to true
   })
